@@ -7,50 +7,57 @@ app.use(express.json());
 
 const sequelize = new Sequelize(process.env.DATABASE_URL);
 
-class Note extends Model {}
-Note.init(
+class Blog extends Model {}
+
+Blog.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    content: {
+    author: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    important: {
-      type: DataTypes.BOOLEAN,
+    url: {
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
-    date: {
-      type: DataTypes.DATE,
+    title: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   },
   {
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: "note",
+    modelName: "blog",
   }
 );
 
-app.get("/api/notes", async (req, res) => {
-  const notes = await Note.findAll();
+app.get("/api/blogs", async (req, res) => {
+  const notes = await Blog.findAll();
   res.json(notes);
 });
 
-app.post("/api/notes", async (req, res) => {
+app.post("/api/blogs", async (req, res) => {
   try {
-    const note = await Note.create(req.body);
+    const note = await Blog.create(req.body);
     return res.json(note);
   } catch (error) {
     return res.status(400).json({ error });
   }
 });
 
-app.post("/api/notes/build", async (req, res) => {
+app.post("/api/blogs/build", async (req, res) => {
   try {
-    const note = Note.build(req.body);
+    const note = Blog.build(req.body);
     note.important = true;
     await note.save();
     res.json(note);
