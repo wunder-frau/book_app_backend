@@ -3,9 +3,9 @@ const router = require("express").Router();
 const { User, Blog } = require("../models");
 
 router.get("/", async (req, res, next) => {
-  //   const users = await User.findAll({
-  //     include: Blog,
-  //   });
+  const users = await User.findAll({
+    include: Blog,
+  });
 
   //INNER JOIN
   //   const users = await User.findAll({
