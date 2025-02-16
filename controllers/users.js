@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
       image_link,
     });
 
-    console.log("Created User:", user.toJSON()); // ✅ Debugging log
+    console.log("Created User:", user.toJSON());
 
     res.status(201).json(user);
   } catch (error) {
