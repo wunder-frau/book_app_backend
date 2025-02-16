@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require("sequelize");
 
-const { sequelize } = require("../util/db");
+const { sequelize } = require("../utils/db");
 
 class User extends Model {}
 
@@ -11,21 +11,25 @@ User.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
+    name: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    about: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    image_link: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
   },
   {
     sequelize,
-    underscored: true,
-    timestamps: false,
+    tableName: "users",
     modelName: "user",
+    underscored: true,
+    timestamps: true,
   }
 );
 

@@ -1,17 +1,9 @@
 const router = require("express").Router();
 
-const { User, Blog } = require("../models");
+const { User } = require("../models");
 
 router.get("/", async (req, res, next) => {
-  const users = await User.findAll({
-    include: Blog,
-  });
-
-  //INNER JOIN
-  //   const users = await User.findAll({
-  //     include: { model: Blog, required: true },
-  //   });
-
+  const users = await User.findAll();
   res.json(users);
 });
 
@@ -31,6 +23,14 @@ router.get("/:id", async (req, res) => {
   } else {
     res.status(404).end();
   }
+});
+
+router.delete("/:id", async (req, res) => {
+  const user = await User.findByPk(req.params.id);
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  await user.destroy();
+  res.json({ message: "User deleted successfully" });
 });
 
 module.exports = router;
