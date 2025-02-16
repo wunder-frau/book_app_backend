@@ -3,7 +3,7 @@ const { Note, Book } = require("../models");
 const jwt = require("jsonwebtoken");
 const { SECRET } = require("../utils/config");
 
-// ✅ Middleware: Extract and Verify JWT Token
+// Middleware: Extract and Verify JWT Token
 const tokenExtractor = (req, res, next) => {
   const authorization = req.get("authorization");
   if (!authorization || !authorization.toLowerCase().startsWith("bearer ")) {
@@ -17,11 +17,24 @@ const tokenExtractor = (req, res, next) => {
   }
 };
 
-// ✅ GET: List all notes for a specific book
-router.get("/:bookId", async (req, res) => {
+// GET: List all notes for a specific book
+// router.get("/:bookId", async (req, res) => {
+//   try {
+//     const notes = await Note.findAll({
+//       where: { book_id: req.params.bookId },
+//     });
+//     res.json(notes);
+//   } catch (error) {
+//     res.status(500).json({ error: "Error retrieving notes" });
+//   }
+// });
+
+// GET: List all notes for a specific book (Only user-created notes are visible)
+router.get("/:bookId", tokenExtractor, async (req, res) => {
   try {
+    const userId = req.decodedToken.id;
     const notes = await Note.findAll({
-      where: { book_id: req.params.bookId },
+      where: { book_id: req.params.bookId, user_id: userId },
     });
     res.json(notes);
   } catch (error) {
@@ -29,17 +42,11 @@ router.get("/:bookId", async (req, res) => {
   }
 });
 
-// ✅ POST: Create a note (Only book owner can add notes)
+// ✅ POST: Create a note (Any user can add notes to an existing book)
 router.post("/:bookId", tokenExtractor, async (req, res) => {
   try {
     const book = await Book.findByPk(req.params.bookId);
     if (!book) return res.status(404).json({ error: "Book not found" });
-
-    if (book.user_id !== req.decodedToken.id) {
-      return res
-        .status(403)
-        .json({ error: "Only the book owner can add notes" });
-    }
 
     const { content } = req.body;
     if (!content || content.length > 5000) {
@@ -48,10 +55,11 @@ router.post("/:bookId", tokenExtractor, async (req, res) => {
         .json({ error: "Content must be between 1 and 5000 characters" });
     }
 
+    // 🔹 Create note and link it to book + user
     const note = await Note.create({
       content,
       book_id: book.id,
-      user_id: req.decodedToken.id,
+      user_id: req.decodedToken.id, // Store who added the note
     });
 
     res.status(201).json(note);
@@ -60,7 +68,7 @@ router.post("/:bookId", tokenExtractor, async (req, res) => {
   }
 });
 
-// ✅ PUT: Update a note (Only the note owner can edit)
+// PUT: Update a note (Only the note owner can edit)
 router.put("/:id", tokenExtractor, async (req, res) => {
   try {
     const note = await Note.findByPk(req.params.id);
@@ -87,7 +95,7 @@ router.put("/:id", tokenExtractor, async (req, res) => {
   }
 });
 
-// ✅ DELETE: Remove a note (Only the note owner can delete)
+// DELETE: Remove a note (Only the note owner can delete)
 router.delete("/:id", tokenExtractor, async (req, res) => {
   try {
     const note = await Note.findByPk(req.params.id);
