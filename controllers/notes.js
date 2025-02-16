@@ -17,18 +17,6 @@ const tokenExtractor = (req, res, next) => {
   }
 };
 
-// GET: List all notes for a specific book
-// router.get("/:bookId", async (req, res) => {
-//   try {
-//     const notes = await Note.findAll({
-//       where: { book_id: req.params.bookId },
-//     });
-//     res.json(notes);
-//   } catch (error) {
-//     res.status(500).json({ error: "Error retrieving notes" });
-//   }
-// });
-
 // GET: List all notes for a specific book (Only user-created notes are visible)
 router.get("/:bookId", tokenExtractor, async (req, res) => {
   try {
@@ -42,7 +30,7 @@ router.get("/:bookId", tokenExtractor, async (req, res) => {
   }
 });
 
-// ✅ POST: Create a note (Any user can add notes to an existing book)
+// POST: Create a note (Any user can add notes to an existing book)
 router.post("/:bookId", tokenExtractor, async (req, res) => {
   try {
     const book = await Book.findByPk(req.params.bookId);
@@ -55,7 +43,7 @@ router.post("/:bookId", tokenExtractor, async (req, res) => {
         .json({ error: "Content must be between 1 and 5000 characters" });
     }
 
-    // 🔹 Create note and link it to book + user
+    // Create note and link it to book + user
     const note = await Note.create({
       content,
       book_id: book.id,
