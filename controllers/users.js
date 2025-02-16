@@ -9,10 +9,23 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res) => {
   try {
-    const user = await User.create(req.body);
-    res.json(user);
+    const { name, about, image_link } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "Name and username are required" });
+    }
+
+    const user = await User.create({
+      name,
+      about,
+      image_link,
+    });
+
+    console.log("Created User:", user.toJSON()); // ✅ Debugging log
+
+    res.status(201).json(user);
   } catch (error) {
-    return res.status(400).json({ error });
+    res.status(400).json({ error: error.message });
   }
 });
 

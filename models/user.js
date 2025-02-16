@@ -1,5 +1,4 @@
 const { Model, DataTypes } = require("sequelize");
-
 const { sequelize } = require("../utils/db");
 
 class User extends Model {}
@@ -12,7 +11,7 @@ User.init(
       autoIncrement: true,
     },
     name: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     about: {
