@@ -24,20 +24,43 @@ router.get("/", async (req, res, next) => {
 });
 
 // GET a specific blog by ID
-router.get("/:id", blogFinder, async (req, res) => {
-  res.json(req.blog);
-});
+// router.get("/:id", blogFinder, async (req, res) => {
+//   res.json(req.blog);
+// });
 
-// POST a new blog (Centralized error handling)
+// // POST a new blog (Centralized error handling)
+// router.post("/", async (req, res, next) => {
+//   try {
+//     const { author, url, title, likes } = req.body;
+
+//     if (!author || !url || !title) {
+//       return next(new Error("Author, URL, and Title are required"));
+//     }
+
+//     const blog = await Blog.create({ author, url, title, likes });
+//     res.status(201).json(blog);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
 router.post("/", async (req, res, next) => {
   try {
-    const { author, url, title, likes } = req.body;
-
-    if (!author || !url || !title) {
-      return next(new Error("Author, URL, and Title are required"));
+    const { title, url, userId } = req.body;
+    if (!title || !url || !userId) {
+      return next(new Error("Title, URL, and userId are required"));
     }
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return next(new Error("User not found"));
+    }
+    const blog = await Blog.create({
+      title,
+      url,
+      author: user.username,
+      userId,
+    });
 
-    const blog = await Blog.create({ author, url, title, likes });
     res.status(201).json(blog);
   } catch (error) {
     next(error);
