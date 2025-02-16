@@ -14,13 +14,13 @@ Book.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    author_name: {
-      type: DataTypes.STRING,
+    author_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    author_lastname: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      references: {
+        model: "authors",
+        key: "id",
+      },
     },
     user_id: {
       type: DataTypes.INTEGER,
