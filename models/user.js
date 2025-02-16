@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 class User extends Model {
   async validPassword(password) {
-    return bcrypt.compare(password, this.password_hash);
+    return bcrypt.compare(password, this.password);
   }
 }
 
@@ -19,15 +19,15 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    about: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
     },
-    image_link: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    password_hash: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },

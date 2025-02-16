@@ -22,7 +22,8 @@ const tokenExtractor = (req, res, next) => {
 // ✅ GET: Fetch all books
 router.get("/", async (req, res) => {
   const books = await Book.findAll({
-    include: { model: User, attributes: ["name"] },
+    attributes: { exclude: ["user_id"] },
+    include: { model: User, attributes: ["id", "name"] },
   });
   res.json(books);
 });

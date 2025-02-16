@@ -23,14 +23,18 @@ const tokenExtractor = (req, res, next) => {
 
 router.post("/signup", async (req, res) => {
   try {
-    const { name, password, about, image_link } = req.body;
-    if (!name || !password) {
+    const { name, password, email } = req.body;
+    if (!name || !password || !email) {
       return res.status(400).json({ error: "Name and password are required" });
     }
 
-    const password_hash = await bcrypt.hash(password, 10);
+    const hash_password = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, about, image_link, password_hash });
+    const user = await User.create({
+      name,
+      password: hash_password,
+      email,
+    });
 
     res.status(201).json({ message: "User created successfully", user });
   } catch (error) {
@@ -43,7 +47,7 @@ router.post("/login", async (req, res) => {
     const { name, password } = req.body;
     const user = await User.findOne({ where: { name } });
 
-    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
@@ -60,7 +64,7 @@ router.post("/login", async (req, res) => {
 router.get("/profile", tokenExtractor, async (req, res) => {
   try {
     const user = await User.findByPk(req.decodedToken.id, {
-      attributes: { exclude: ["password_hash"] },
+      attributes: { exclude: ["password"] },
     });
 
     if (!user) return res.status(404).json({ error: "User not found" });
