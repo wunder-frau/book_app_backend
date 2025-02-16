@@ -8,6 +8,7 @@ const { connectToDatabase } = require("./utils/db");
 const usersRouter = require("./controllers/users");
 const authRoutes = require("./controllers/auth");
 const booksRoutes = require("./controllers/books");
+const notesRoutes = require("./controllers/notes");
 
 const errorHandler = require("./middleware/errorHandler");
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/books", booksRoutes);
+app.use("/api/notes", notesRoutes);
 
 app.use(errorHandler);
 
