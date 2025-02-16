@@ -28,7 +28,7 @@ User.init(
     tableName: "users",
     modelName: "user",
     underscored: true,
-    timestamps: true,
+    timestamps: false,
   }
 );
 

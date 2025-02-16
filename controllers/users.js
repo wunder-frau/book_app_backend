@@ -46,4 +46,22 @@ router.delete("/:id", async (req, res) => {
   res.json({ message: "User deleted successfully" });
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, about, image_link } = req.body;
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.name = name || user.name;
+    user.about = about || user.about;
+    user.image_link = image_link || user.image_link;
+
+    await user.save();
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 module.exports = router;
