@@ -28,6 +28,11 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Name and password are required" });
     }
 
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ error: "Email is already in use" });
+    }
+
     const hash_password = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -44,14 +49,14 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { name, password } = req.body;
-    const user = await User.findOne({ where: { name } });
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: user.id, name: user.name }, SECRET, {
+    const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
       expiresIn: "1h",
     });
 
