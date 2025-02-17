@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 require("express-async-errors");
 const app = express();
 
@@ -11,6 +12,7 @@ const booksRoutes = require("./controllers/books");
 const notesRoutes = require("./controllers/notes");
 
 const errorHandler = require("./middleware/errorHandler");
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 
 app.use("/api/users", usersRouter);

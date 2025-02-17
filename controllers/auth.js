@@ -41,7 +41,14 @@ router.post("/signup", async (req, res) => {
       email,
     });
 
-    res.status(201).json({ message: "User created successfully", user });
+    const userForToken = { id: user.id, email: user.email };
+    const accessToken = jwt.sign(userForToken, SECRET, { expiresIn: "1h" });
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: { id: user.id, email: user.email, name: user.name },
+      accessToken,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
