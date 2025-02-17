@@ -50,7 +50,16 @@ router.post("/", tokenExtractor, async (req, res) => {
       user_id: user.id,
     });
 
-    res.status(201).json(book);
+    const createdBook = await Book.findByPk(book.id, {
+      include: [
+        {
+          model: Author,
+          attributes: ["id", "firstname", "lastname"],
+        },
+      ],
+    });
+
+    res.status(201).json(createdBook);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

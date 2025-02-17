@@ -18,13 +18,29 @@ const tokenExtractor = (req, res, next) => {
 };
 
 // GET: List all notes for a specific book (Only user-created notes are visible)
+// router.get("/:bookId", tokenExtractor, async (req, res) => {
+//   try {
+//     const userId = req.decodedToken.id;
+//     const notes = await Note.findAll({
+//       where: { book_id: req.params.bookId, user_id: userId },
+//       attributes: ["id", "content"],
+//     });
+//     res.json(notes);
+//   } catch (error) {
+//     res.status(500).json({ error: "Error retrieving notes" });
+//   }
+// });
 router.get("/:bookId", tokenExtractor, async (req, res) => {
   try {
     const userId = req.decodedToken.id;
     const notes = await Note.findAll({
       where: { book_id: req.params.bookId, user_id: userId },
+      attributes: ["id", "content"],
     });
-    res.json(notes);
+
+    console.log("Notes fetched from DB:", notes); // ✅ Debugging log
+
+    res.json(Array.isArray(notes) ? notes : []); // ✅ Ensure response is an array
   } catch (error) {
     res.status(500).json({ error: "Error retrieving notes" });
   }
