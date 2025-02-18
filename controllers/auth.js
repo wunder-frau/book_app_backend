@@ -42,7 +42,9 @@ router.post("/signup", async (req, res) => {
     });
 
     const userForToken = { id: user.id, email: user.email };
-    const accessToken = jwt.sign(userForToken, SECRET, { expiresIn: "1h" });
+    const accessToken = jwt.sign(userForToken, SECRET, {
+      expiresIn: 60 * 60 * 24 * 7,
+    });
 
     res.status(201).json({
       message: "User created successfully",
@@ -64,7 +66,7 @@ router.post("/login", async (req, res) => {
     }
 
     const accessToken = jwt.sign({ id: user.id, email: user.email }, SECRET, {
-      expiresIn: "1h",
+      expiresIn: 60 * 60 * 24 * 7,
     });
 
     res.json({

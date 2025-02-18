@@ -45,14 +45,6 @@ app.use(requestLogger);
 
 app.use(helmet({ permissionsPolicy: false }));
 
-app.use((req, res, next) => {
-  res.setHeader(
-    "Permissions-Policy",
-    "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=()"
-  );
-  next();
-});
-
 app.get("/crash-test", () => {
   setTimeout(() => {
     throw new Error("The server is about to crash");
