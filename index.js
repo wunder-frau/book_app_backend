@@ -1,5 +1,7 @@
 const express = require("express");
+const helmet = require("helmet");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 require("express-async-errors");
 const { requestLogger, errorLogger } = require("./middleware/logger");
 const app = express();
@@ -13,9 +15,15 @@ const booksRoutes = require("./controllers/books");
 const notesRoutes = require("./controllers/notes");
 
 const errorHandler = require("./middleware/errorHandler");
-//app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-const allowedOrigins = ["https://books.iresta.rest", "http://localhost:5173"];
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
+
+const allowedOrigins = ["https://books.iresta.rest", "http://localhost:5173"];
 app.use(
   cors({
     credentials: true,
@@ -34,6 +42,22 @@ app.use(
 
 app.use(express.json());
 app.use(requestLogger);
+
+app.use(helmet({ permissionsPolicy: false }));
+
+app.use((req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=()"
+  );
+  next();
+});
+
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("The server is about to crash");
+  }, 0);
+});
 
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRoutes);
