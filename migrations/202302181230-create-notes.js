@@ -1,3 +1,5 @@
+"use strict";
+
 const { Sequelize } = require("sequelize");
 
 module.exports = {
@@ -10,7 +12,7 @@ module.exports = {
         allowNull: false,
       },
       content: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING(5000),
         allowNull: false,
       },
       book_id: {
@@ -30,6 +32,16 @@ module.exports = {
           key: "id",
         },
         onDelete: "CASCADE",
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },

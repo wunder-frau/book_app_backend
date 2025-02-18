@@ -13,7 +13,25 @@ const booksRoutes = require("./controllers/books");
 const notesRoutes = require("./controllers/notes");
 
 const errorHandler = require("./middleware/errorHandler");
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+//app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const allowedOrigins = ["https://books.iresta.rest", "http://localhost:5173"];
+
+app.use(
+  cors({
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    optionsSuccessStatus: 204,
+  })
+);
+
 app.use(express.json());
 app.use(requestLogger);
 
@@ -22,8 +40,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/books", booksRoutes);
 app.use("/api/notes", notesRoutes);
 
-app.use(errorHandler);
 app.use(errorLogger);
+app.use(errorHandler);
 
 const start = async () => {
   await connectToDatabase();

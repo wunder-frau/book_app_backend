@@ -1,3 +1,5 @@
+"use strict";
+
 const { Sequelize } = require("sequelize");
 
 module.exports = {
@@ -13,13 +15,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      author_name: {
-        type: Sequelize.STRING,
+      author_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-      },
-      author_lastname: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        references: {
+          model: "authors",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       user_id: {
         type: Sequelize.INTEGER,
@@ -28,7 +31,7 @@ module.exports = {
           model: "users",
           key: "id",
         },
-        onDelete: "CASCADE", // If a user is deleted, their books are removed too
+        onDelete: "CASCADE",
       },
     });
   },

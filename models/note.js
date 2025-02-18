@@ -11,7 +11,7 @@ Note.init(
       autoIncrement: true,
     },
     content: {
-      type: DataTypes.STRING(5000), // 🔹 Max length = 5000 characters
+      type: DataTypes.STRING(5000),
       allowNull: false,
     },
     book_id: {

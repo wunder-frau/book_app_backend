@@ -13,13 +13,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      about: {
-        type: Sequelize.TEXT,
-        allowNull: true,
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
-      image_link: {
-        type: Sequelize.TEXT,
-        allowNull: true,
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
     });
   },
