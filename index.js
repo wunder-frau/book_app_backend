@@ -23,7 +23,11 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-const allowedOrigins = ["https://books.iresta.rest", "http://localhost:5173"];
+const allowedOrigins = [
+  "https://books.iresta.rest",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
 app.use(
   cors({
     credentials: true,

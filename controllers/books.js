@@ -17,11 +17,16 @@ const tokenExtractor = (req, res, next) => {
 };
 
 router.get("/", async (req, res) => {
-  const books = await Book.findAll({
-    attributes: { exclude: ["user_id", "author_id"] },
-    include: [{ model: Author, attributes: ["id", "firstname", "lastname"] }],
-  });
-  res.json(books);
+  try {
+    const books = await Book.findAll({
+      attributes: ["id", "title", "user_id"],
+      include: [{ model: Author, attributes: ["id", "firstname", "lastname"] }],
+    });
+
+    res.json(books);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching books" });
+  }
 });
 
 router.post("/", tokenExtractor, async (req, res) => {
