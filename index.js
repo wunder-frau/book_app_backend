@@ -1,65 +1,67 @@
-require("dotenv").config();
-
-const { Sequelize, Model, DataTypes } = require("sequelize");
 const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
+const rateLimit = require("express-rate-limit");
+require("express-async-errors");
+const { requestLogger, errorLogger } = require("./middleware/logger");
 const app = express();
-app.use(express.json());
 
-const sequelize = new Sequelize(process.env.DATABASE_URL);
+const { PORT } = require("./utils/config");
+const { connectToDatabase } = require("./utils/db");
 
-class Note extends Model {}
-Note.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    important: {
-      type: DataTypes.BOOLEAN,
-    },
-    date: {
-      type: DataTypes.DATE,
-    },
-  },
-  {
-    sequelize,
-    underscored: true,
-    timestamps: false,
-    modelName: "note",
-  }
+const usersRouter = require("./controllers/users");
+const authRoutes = require("./controllers/auth");
+const booksRoutes = require("./controllers/books");
+const notesRoutes = require("./controllers/notes");
+
+const errorHandler = require("./middleware/errorHandler");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
+
+const allowedOrigins = [
+  "https://books.iresta.rest",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
+app.use(
+  cors({
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    origin: allowedOrigins,
+    optionsSuccessStatus: 204,
+    preflightContinue: false,
+  })
 );
 
-app.get("/api/notes", async (req, res) => {
-  const notes = await Note.findAll();
-  res.json(notes);
+app.use(express.json());
+app.use(requestLogger);
+
+app.use(helmet({ permissionsPolicy: false }));
+
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("The server is about to crash");
+  }, 0);
 });
 
-app.post("/api/notes", async (req, res) => {
-  try {
-    const note = await Note.create(req.body);
-    return res.json(note);
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
-});
+app.use("/api/users", usersRouter);
+app.use("/api/auth", authRoutes);
+app.use("/api/books", booksRoutes);
+app.use("/api/notes", notesRoutes);
 
-app.post("/api/notes/build", async (req, res) => {
-  try {
-    const note = Note.build(req.body);
-    note.important = true;
-    await note.save();
-    res.json(note);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+app.use(errorLogger);
+app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const start = async () => {
+  await connectToDatabase();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+start();
