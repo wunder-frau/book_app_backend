@@ -1,7 +1,6 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
-const rateLimit = require("express-rate-limit");
 require("express-async-errors");
 const { requestLogger, errorLogger } = require("./middleware/logger");
 const app = express();
@@ -35,12 +34,6 @@ app.use(express.json());
 app.use(requestLogger);
 
 app.use(helmet({ permissionsPolicy: false }));
-
-app.get("/crash-test", () => {
-  setTimeout(() => {
-    throw new Error("The server is about to crash");
-  }, 0);
-});
 
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRoutes);
