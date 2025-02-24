@@ -16,13 +16,6 @@ const notesRoutes = require("./controllers/notes");
 
 const errorHandler = require("./middleware/errorHandler");
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
-
-app.use(limiter);
-
 const allowedOrigins = [
   "https://books.iresta.rest",
   "http://localhost:5173",
